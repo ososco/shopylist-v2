@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import autoBind from "react-autobind";
 import Select from "react-select";
+import EditableLabel from "./macro/EditableLabel";
 
 class List extends Component {
   constructor(props) {
@@ -58,12 +59,30 @@ class List extends Component {
 
   render() {
     const { isOwner, usersList, sharedList } = this.state;
-    const { currentListInfo, leaveSharedList, deleteList } = this.props;
+    const {
+      currentListInfo,
+      leaveSharedList,
+      deleteList,
+      changeListName
+    } = this.props;
     return currentListInfo ? (
       <div>
         <div className="section">
           <h3>List details:</h3>
-          <p>List name: {currentListInfo.name}</p>
+          <p>
+            List name:{" "}
+            {isOwner ? (
+              <EditableLabel
+                initialValue={currentListInfo.name}
+                save={value => changeListName(value)}
+                labelClass="section-label"
+                inputClass="section-input"
+              />
+            ) : (
+              currentListInfo.name
+            )}
+          </p>
+
           <p>Owner: {this.getUserById(currentListInfo.owner)}</p>
         </div>
         {isOwner ? (

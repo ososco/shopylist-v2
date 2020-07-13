@@ -44,6 +44,7 @@ class App extends Component {
       function(user) {
         if (user) {
           const { displayName, uid } = firebase.auth().currentUser;
+
           this.setState({
             user: displayName,
             userid: uid,
@@ -127,6 +128,13 @@ class App extends Component {
     };
 
     listsRef.push(listData);
+  }
+
+  changeListName(value) {
+    const { currentList } = this.state;
+    let itemsRef = database.ref("lists/" + currentList);
+
+    itemsRef.update({ name: value });
   }
 
   getUserLists(user) {
@@ -338,6 +346,7 @@ class App extends Component {
             currentListInfo={this.state.currentListInfo}
             leaveSharedList={this.leaveSharedList}
             deleteList={this.deleteList}
+            changeListName={value => this.changeListName(value)}
           />
         );
       case "lists":
