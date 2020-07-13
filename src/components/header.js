@@ -5,7 +5,7 @@ function Header() {
     <header>
       <div className="logo"> </div>
 
-      <h1 draggable>Shopylist</h1>
+      <h1 draggable>SHOPYLIST</h1>
     </header>
   );
 }
