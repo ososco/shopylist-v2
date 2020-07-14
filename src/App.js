@@ -4,6 +4,8 @@ import autoBind from "react-autobind";
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
+import Loader from "react-loader-spinner";
+
 import { config } from "./helpers/config.js";
 import { snapshotToArray, mapSnapshotToArray } from "./helpers";
 import Header from "./components/header";
@@ -14,6 +16,7 @@ import List from "./components/list";
 import Lists from "./components/lists";
 
 import "./styles.css";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(config);
@@ -26,6 +29,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoading: true,
       tab: "items",
       emailInput: "",
       passwordInput: "",
@@ -40,33 +44,30 @@ class App extends Component {
   }
 
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(
-      function(user) {
-        if (user) {
-          const { displayName, uid } = firebase.auth().currentUser;
-
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        const { displayName, uid } = firebase.auth().currentUser;
+        this.setState({
+          user: displayName,
+          userid: uid,
+          isLoggedin: true
+        });
+        let userRef = database.ref("users/" + uid + "/lastOpenedList");
+        userRef.on("value", snapshot => {
           this.setState({
-            user: displayName,
-            userid: uid,
-            isLoggedin: true
+            lastOpenedList: snapshot.val(),
+            currentList: snapshot.val()
           });
-          let userRef = database.ref("users/" + uid + "/lastOpenedList");
-          userRef.on("value", snapshot => {
-            this.setState({
-              lastOpenedList: snapshot.val(),
-              currentList: snapshot.val()
-            });
-            this.getCurrentlistInfo(snapshot.val());
-            this.getItems(snapshot.val());
-          });
-          this.getUserLists(uid);
-          this.getUsersList();
-        } else {
-          this.setState({ isLoggedin: false });
-          console.log("guest");
-        }
-      }.bind(this)
-    );
+          this.getCurrentlistInfo(snapshot.val());
+          this.getItems(snapshot.val());
+        });
+        this.getUserLists(uid);
+        this.getUsersList();
+      } else {
+        this.setState({ isLoggedin: false, isLoading: false });
+        console.log("guest");
+      }
+    });
   }
 
   handleChange(e) {
@@ -87,7 +88,7 @@ class App extends Component {
         if (error) {
           alert(error.message);
         }
-        this.setState({ isLoggedin: true });
+        this.setState({ isLoggedin: true, emailInput: "", passwordInput: "" });
       });
   }
 
@@ -197,7 +198,7 @@ class App extends Component {
     let itemsRef = database.ref("lists/" + key + "/items");
 
     itemsRef.on("value", snapshot => {
-      this.setState({ items: snapshotToArray(snapshot) });
+      this.setState({ items: snapshotToArray(snapshot), isLoading: false });
     });
   }
 
@@ -377,17 +378,20 @@ class App extends Component {
   }
 
   render() {
-    const { tab, isLoggedin } = this.state;
+    const { tab, isLoading, isLoggedin } = this.state;
     return (
       <div className="App">
-        {!isLoggedin ? (
+        {isLoading ? (
+          <div className="center">
+            <Loader type="Circles" color="#de350b" height={100} width={100} />
+          </div>
+        ) : !isLoggedin ? (
           <div>
             <Login login={this.login} handleChange={this.handleChange} />
           </div>
         ) : (
           <div>
             <Header />
-            {/* <p>{this.state.user}</p> */}
 
             {this.getComponent()}
 

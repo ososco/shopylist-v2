@@ -228,20 +228,22 @@ class Items extends Component {
             )}
           </Droppable>
         </DragDropContext>
-        <div className="clear-btns-div">
-          <button
-            className="primary-btn btn-danger"
-            onClick={this.props.deleteCrossedItems}
-          >
-            Clear crossed
-          </button>
-          <button
-            className="primary-btn btn-danger"
-            onClick={this.props.deleteAllItems}
-          >
-            Clear all
-          </button>
-        </div>
+        {this.props.items.length > 0 ? (
+          <div className="clear-btns-div">
+            <button
+              className="primary-btn btn-danger"
+              onClick={this.props.deleteCrossedItems}
+            >
+              Clear crossed
+            </button>
+            <button
+              className="primary-btn btn-danger"
+              onClick={this.props.deleteAllItems}
+            >
+              Clear all
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   }

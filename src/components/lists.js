@@ -34,7 +34,7 @@ class Lists extends Component {
                 </li>
               ))}
             </ul>
-            <h3>Shared lists</h3>
+            <h3 className="twentyfive-up">Shared lists</h3>
             <ul className="listLists">
               {sharedLists.map(e => (
                 <li
